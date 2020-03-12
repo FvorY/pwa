@@ -1,0 +1,25 @@
+<br>
+<div id="app">
+
+  <div class="row">
+     <div class="input-field col s12">
+       <input id="Search" type="Search" v-model="search" @keyup="getsearch" class="validate">
+       <label for="Search">Search</label>
+     </div>
+   </div>
+
+   <div class="show data" id="showdata" style="overflow-y: scroll; position:relative;" align="center">
+     <template v-if="data.length != 0">
+       <div>
+         <data-list :data="data"></data-list>
+      </div>
+     </template>
+     <template v-else>
+       <div>
+         <button-add></button-add>
+      </div>
+     </template>
+   </div>
+</div>
+<br>
+<br>

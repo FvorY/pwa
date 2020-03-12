@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>My First PWA</title>
+  <meta name="description" content="My first PWA"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#00897B"/>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/materialize.min.css">
+  <link rel="stylesheet" type="text/css" href="fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+  <!-- Vue js -->
+  <script src="https://unpkg.com/vue@2.0.3/dist/vue.js"></script>
+  <script src="https://unpkg.com/axios@0.12.0/dist/axios.min.js"></script>
+  <script src="https://unpkg.com/lodash@4.13.1/lodash.min.js"></script>
+  <style media="screen">
+
+  .menutop{
+    background-color: #1A6697;
+  }
+  .bottomnav > a { display: inline-block; margin-left: 10px; margin-right: 15px; padding-left: 2px; padding: 7px;}
+  a { text-decoration: none; color: black;}
+  .container {
+    height: 100%;
+  }
+  .bottomnav {
+     position: fixed;
+     left: 0;
+     bottom: -4%;
+     width: 100%;
+     height: 60px;
+     border-top: 1px solid rgb(175, 179, 175);
+
+     /* background-color: red; */
+     /* color: white; */
+     text-align: center;
+     background-color: white;
+  }
+  .active {
+    color: #1A6697 !important;
+  }
+  </style>
+</head>
+<body>
+  <!-- Navigasi -->
+  <div id="nav">
+    <div class="navbar-fixed">
+        <nav class="menutop">
+            <div class="nav-wrapper container">
+                <a href="#!" class="brand-logo">&nbsp;My App</a>
+            </div>
+        </nav>
+    </div>
+</div>
+  <!-- <nav class="menutop" role="navigation">
+    <div class="nav-wrapper container">
+      <a href="#" class="brand-logo" id="logo-container">My App</a> -->
+      <!-- <a href="#" class="sidenav-trigger" data-target="nav-mobile">☰</a> -->
+
+      <!-- <ul class="topnav right hide-on-med-and-down"></ul> -->
+    <!-- </div>
+  </nav> -->
+  <!-- Akhir Navigasi -->
+  <div class="container" id="body-content">
+  </div>
+  <ul class="bottomnav" id="nav-mobile"></ul>
+  <script src="js/jquery.js"></script>
+  <script src="js/materialize.min.js"></script>
+  <script src="js/nav.js"></script>
+  <!-- <script src="js/closepwa.js"></script> -->
+  <script>
+    // REGISTER SERVICE WORKER
+    // if ("serviceWorker" in navigator) {
+    //   window.addEventListener("load", function() {
+    //     navigator.serviceWorker
+    //       .register("service-worker.js")
+    //       .then(function() {
+    //         console.log("Pendaftaran ServiceWorker berhasil");
+    //       })
+    //       .catch(function() {
+    //         console.log("Pendaftaran ServiceWorker gagal");
+    //       });
+    //   });
+    // } else {
+    //   console.log("ServiceWorker belum didukung browser ini.");
+    // }
+    if (navigator.serviceWorker) {
+      navigator.serviceWorker.register('service-worker.js').then(function(registration) {
+        console.log('ServiceWorker registration successful with scope:',  registration.scope);
+      }).catch(function(error) {
+        console.log('ServiceWorker registration failed:', error);
+      });
+    }
+  </script>
+  <script type="text/javascript">
+  localStorage['menu'] = '#home';
+  var file;
+  var vue;
+    document.addEventListener("DOMContentLoaded", function() {
+      // Activate sidebar nav
+      var elems = document.querySelectorAll(".bottomnav");
+      M.Sidenav.init(elems);
+      loadNav();
+
+      function loadNav() {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4) {
+          if (this.status != 200) return;
+
+          // Muat daftar tautan menu
+          document.querySelectorAll(".topnav, .bottomnav").forEach(function(elm) {
+            elm.innerHTML = xhttp.responseText;
+            //set active
+            var parm = localStorage['menu'];
+            $(parm+'menu').addClass('active');
+            //Add class active
+            $('.waves-effect').on('click', function(){
+              $('.waves-effect').removeClass('active');
+              $(this).addClass('active');
+              localStorage['menu'] = $(this).attr('href');
+            })
+
+            // Upload image
+            var camera = document.getElementById('camera');
+            // var frame = document.getElementById('frame');
+            var el = document.getElementById('overlayBtn');
+            if(camera){
+              camera.addEventListener('change', function(e) {
+                // alert('asd')
+                file = e.target.files[0];
+                // Do something with the image file.
+                // frame.src = URL.createObjectURL(file);
+              });
+            }
+
+            // window.addEventListener('load', function() {
+            //   window.history.pushState({}, '')
+            // })
+          });
+
+          // Daftarkan event listener untuk setiap tautan menu
+          document.querySelectorAll(".bottomnav a, .topnav a").forEach(function(elm) {
+            elm.addEventListener("click", function(event) {
+              // Tutup sidenav
+              var sidenav = document.querySelector(".bottomnav");
+              M.Sidenav.getInstance(sidenav).close();
+
+              // Muat konten halaman yang dipanggil
+              page = event.target.getAttribute("href").substr(1);
+              loadPage(page);
+            });
+          });
+        }
+      };
+      xhttp.open("GET", "nav.html", true);
+      xhttp.send();
+    }
+    });
+  </script>
+  <script type="text/javascript">
+  // function winclose(){
+  //   var e = jQuery.Event("keydown");
+  //   e.which = 87;       // # F1 code value
+  //   e.ctrlkey = true;     // control key pressed
+  //   $(document).trigger(e);// trigger event on document
+  // }
+  function uploadimage(){
+    // var formdata = new FormData();
+    // formdata.append('file', file);
+    // $.ajax({
+    //   url: "https://slack.com/api/files.upload",
+    //   type: "POST",
+    //   data: file,
+    //   processData: false,
+    //   contentType: false,
+    //   contentType: "application/x-www-form-urlencoded",
+    //   success: function (data) {
+    //       console.log(data);
+    //   }
+    // });
+  }
+
+  function closepwa(){
+    window.localStorage.clear();
+    window.location.href = window.location.origin + '/pwa/';
+  }
+
+  $(document).ready(function(){
+      history.pushState(null, null, location.href);
+        window.onpopstate = function () {
+            history.go(1);
+        };
+  });
+  </script>
+  <script type="text/javascript">
+    function deletedata(parm) {  
+      var id = $(parm).data('id');
+      var toastHTML = '<span>Ingin menghapus data?</span><button class="btn-flat toast-action">No</button><button onclick="deleteaction('+id+')" class="btn-flat toast-action">Yes</button>';
+      M.toast({html: toastHTML});          
+    }
+
+    function deleteaction(id){
+      M.Toast.dismissAll();
+      $.ajax({
+        type: 'POST',
+        data: {id:id},
+        dataType: 'json',
+        url: '/pwa/php/delete.php',
+        success : function(response){
+          if(response == 'sukses') {
+            M.toast({html: 'Data Berhasil Dihapus!', classes: 'rounded'});
+            vue.getdata();
+          }
+        }
+      });
+    }
+
+    function editdata(parm){
+      var id = $(parm).data('id');
+      window.location.href = window.location.origin + '/pwa/php/edit.php?id='+id;
+    }
+  </script>
+</body>
+</html>
